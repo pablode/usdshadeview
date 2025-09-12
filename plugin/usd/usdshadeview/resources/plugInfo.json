@@ -1,0 +1,16 @@
+{
+    "Plugins": [
+        {
+            "Type": "python",
+            "Name": "usdshadeview",
+            "Info": {
+                "Types": {
+                    "usdshadeview.UsdShadeViewContainer": {
+                        "bases": ["pxr.Usdviewq.plugin.PluginContainer"],
+                        "displayName": "usdshadeview"
+                    }
+                }
+            }
+        }
+    ]
+}
