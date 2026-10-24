@@ -745,7 +745,7 @@ def MakeAssetValueWidget(value):
                 img.close()
 
             imgFormat = None
-            if imgData and spec.width > 0 and spec.height > 0:
+            if imgData is not None and len(imgData) > 0 and spec.width > 0 and spec.height > 0:
                 if spec.nchannels == 1:
                     imgFormat = QtGui.QImage.Format_Grayscale8
                 elif spec.nchannels == 3:
