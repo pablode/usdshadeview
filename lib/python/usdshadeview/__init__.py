@@ -40,7 +40,7 @@ MAX_NODE_GRAPH_DEPTH = 80
 mtlxSupported = True
 try:
     from pxr import UsdBakeMtlx
-except ModuleNotFoundError:
+except (ImportError, OSError):
     mtlxSupported = False
 
 # Allows us to support EXR and other image file types that Qt doesn't
@@ -48,7 +48,7 @@ oiioSupported = True
 try:
     import OpenImageIO as oiio
     oiioSupported = hasattr(oiio, 'ImageInput') # Guard against broken installation
-except ModuleNotFoundError:
+except (ImportError, OSError):
     oiioSupported = False
 
 class UIColors(str, Enum):
