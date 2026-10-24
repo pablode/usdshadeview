@@ -899,7 +899,7 @@ def MakeValueStr(value, typeName):
         return valueStr
     elif typeName == Sdf.ValueTypeNames.TimeCode:
         return FormatFloatShort(value.GetValue())
-    elif typeName == Sdf.ValueTypeNames.Opaque or str(typeName) == 'group':
+    elif str(typeName) == 'opaque' or str(typeName) == 'group': # Sdf.ValueTypeNames.Opaque does not exist in USD v22.11
         return '???'
     elif typeName in (Sdf.ValueTypeNames.Quatd, Sdf.ValueTypeNames.Quatf, Sdf.ValueTypeNames.Quath):
         return ToString(value)
