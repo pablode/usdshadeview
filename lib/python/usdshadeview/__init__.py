@@ -250,7 +250,7 @@ class BakeMtlxDialog(QtWidgets.QDialog):
         self.accept() # close dialog
 
 
-# Global dict <NodeInput, DialogWindow>, which we use to keep alive,
+# Global dict <attribute path, DialogWindow>, which we use to keep alive,
 # deduplicate and bring to front existing metadata dialogs.
 metadataDialogs = {}
 
@@ -320,15 +320,26 @@ class MetadataDialog(QtWidgets.QDialog):
 
 
 def OpenMetadataDialog(nodeInput, metadata):
-    if nodeInput in metadataDialogs:
-        d = metadataDialogs[nodeInput]
+    key = str(nodeInput.GetAttr().GetPath())
+
+    d = metadataDialogs.get(key)
+    if d is not None:
         if d.isVisible(): # check if window was closed
             d.raise_()
             d.activateWindow()
             return
+        metadataDialogs.pop(key, None)
+        d.deleteLater()
 
     d = MetadataDialog(metadata)
-    metadataDialogs[nodeInput] = d
+    d.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+
+    def ForgetDialog(*_):
+        if metadataDialogs.get(key) is d:
+            del metadataDialogs[key]
+
+    d.destroyed.connect(ForgetDialog)
+    metadataDialogs[key] = d
     d.show()
 
 
