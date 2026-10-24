@@ -1761,7 +1761,7 @@ Tf.Type.Define(UsdShadeViewContainer)
 
 
 # Ignore warning spam in certain configurations
-baseHandler = QtCore.qInstallMessageHandler(None)
+baseHandler = None
 
 def customMessageHandler(mode, context, message):
     if "unsupported paint engine type" in message:
@@ -1770,4 +1770,4 @@ def customMessageHandler(mode, context, message):
         baseHandler(mode, context, message)
 
 if enableHwAcceleration and platform.system() == 'Darwin':
-    QtCore.qInstallMessageHandler(customMessageHandler)
+    baseHandler = QtCore.qInstallMessageHandler(customMessageHandler)
