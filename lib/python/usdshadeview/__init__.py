@@ -838,9 +838,11 @@ def MakeValueStr(value, typeName):
     else:
         isPathExpression = False
 
-    if typeName == Sdf.ValueTypeNames.Float:
+    if typeName == Sdf.ValueTypeNames.Float or typeName == Sdf.ValueTypeNames.Half or typeName == Sdf.ValueTypeNames.Double:
         return FormatFloatShort(value)
-    elif typeName == Sdf.ValueTypeNames.Bool or typeName == Sdf.ValueTypeNames.Int:
+    elif typeName in (Sdf.ValueTypeNames.Bool, Sdf.ValueTypeNames.Int,
+                      Sdf.ValueTypeNames.Int64, Sdf.ValueTypeNames.UChar,
+                      Sdf.ValueTypeNames.UInt, Sdf.ValueTypeNames.UInt64):
         return ToString(value)
     elif typeName == Sdf.ValueTypeNames.String or typeName == Sdf.ValueTypeNames.Token or isPathExpression:
         if isPathExpression:
@@ -852,9 +854,11 @@ def MakeValueStr(value, typeName):
         return valueStr
     elif typeName == Sdf.ValueTypeNames.TimeCode:
         return FormatFloatShort(value.GetValue())
-    elif typeName == Sdf.ValueTypeNames.Opaque:
+    elif typeName == Sdf.ValueTypeNames.Opaque or str(typeName) == 'group':
         return '???'
     elif typeName in (Sdf.ValueTypeNames.Quatd, Sdf.ValueTypeNames.Quatf, Sdf.ValueTypeNames.Quath):
+        return ToString(value)
+    elif str(typeName) == 'duration':
         return ToString(value)
     else:
         print(f"WARNING: unhandled type {str(typeName)}", file=sys.stderr)
