@@ -1717,8 +1717,11 @@ class GraphDialog(QtWidgets.QDialog):
         return None
 
     def SetNodeGraph(self, nodeGraph):
-        # Store old NGs on a stack so that we can navigate back using the menu
-        if self.nodeGraph is not None and nodeGraph != self.nodeGraph:
+        if self.nodeGraph is not None:
+            if nodeGraph.GetPrim() == self.nodeGraph.GetPrim():
+                return # Already showing this graph
+
+            # Store old NGs on a stack so that we can navigate back using the menu
             state = (self.nodeGraph, self.selectedOutput)
             self.historyStack.append(state)
 
