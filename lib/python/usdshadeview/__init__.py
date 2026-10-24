@@ -799,7 +799,7 @@ def MakeFloat4ValueWidget(value, isQuaternion = False):
 
     orientation = QtCore.Qt.Horizontal
 
-    hasShortValues = abs(minValue) > 0.01 and abs(maxValue) < 100
+    hasShortValues = (minValue == 0.0 or abs(minValue) > 0.01) and abs(maxValue) < 100
 
     if value.dimension > 3 or (value.dimension == 3 and not hasShortValues):
         orientation = QtCore.Qt.Vertical
