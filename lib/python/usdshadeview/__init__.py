@@ -203,9 +203,13 @@ class BakeMtlxDialog(QtWidgets.QDialog):
         formLayout = QtWidgets.QFormLayout()
 
         self.dirPath = os.getcwd()
+        self.dirPathEdit = QtWidgets.QLineEdit(self.dirPath)
+        self.dirPathEdit.setReadOnly(True)
+        formLayout.addRow("Directory:", self.dirPathEdit)
+
         self.dirBrowseButton = QtWidgets.QPushButton("Open...")
         self.dirBrowseButton.clicked.connect(self.OpenDirDialog)
-        formLayout.addRow("Directory:", self.dirBrowseButton)
+        formLayout.addRow("", self.dirBrowseButton)
 
         self.imgWidth = QtWidgets.QSpinBox()
         self.imgWidth.setRange(1, 4096)
@@ -237,9 +241,10 @@ class BakeMtlxDialog(QtWidgets.QDialog):
         self.setFixedHeight(self.sizeHint().height())
 
     def OpenDirDialog(self):
-        dirPath = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory")
+        dirPath = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory", self.dirPath)
         if dirPath:
             self.dirPath = dirPath
+            self.dirPathEdit.setText(dirPath)
 
     def OnAccept(self):
         UsdBakeMtlx.BakeMaterial(
