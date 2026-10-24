@@ -1553,6 +1553,7 @@ class GraphWidget(QtWidgets.QWidget):
 
     def PopulateScene(self, nodeGraph, selectedOutput):
         self.nodeGraph = nodeGraph
+        oldScene = self.scene
         self.scene = QtWidgets.QGraphicsScene(self)
 
         rootPrim = nodeGraph.GetPrim()
@@ -1590,6 +1591,9 @@ class GraphWidget(QtWidgets.QWidget):
 
         self.graphView.setScene(self.scene)
 
+        if oldScene is not None:
+            oldScene.deleteLater()
+
     def __init__(self, ngChangeCallback):
         super().__init__()
 
@@ -1597,6 +1601,7 @@ class GraphWidget(QtWidgets.QWidget):
 
         self.ngChangeCallback = ngChangeCallback
         self.graphView = graphView
+        self.scene = None
 
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(graphView)
