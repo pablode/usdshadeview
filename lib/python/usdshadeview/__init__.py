@@ -1636,6 +1636,8 @@ class GraphDialog(QtWidgets.QDialog):
             image.save(filePath)
 
     def UpdateMenuBar(self):
+        layout = self.layout()
+        oldMenuBar = layout.menuBar()
         menuBar = QtWidgets.QMenuBar(self)
 
         viewMenu = menuBar.addMenu("View")
@@ -1673,8 +1675,11 @@ class GraphDialog(QtWidgets.QDialog):
         exportAction = toolsMenu.addAction("Export as Image...")
         exportAction.triggered.connect(lambda *args: self.ShowExportAsImageDialog())
 
-        layout = self.layout()
         layout.setMenuBar(menuBar)
+
+        if oldMenuBar is not None:
+            oldMenuBar.hide()
+            oldMenuBar.deleteLater()
 
     def BackToParentNodeGraph(self):
         self.nodeGraph, self.selectedOutput = self.historyStack.pop()
