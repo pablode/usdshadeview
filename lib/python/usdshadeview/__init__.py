@@ -1706,10 +1706,16 @@ class GraphDialog(QtWidgets.QDialog):
         # For materials, we try to select the 'surface' output. For NGs, none.
         if self.nodeGraph.GetPrim().IsA(UsdShade.Material):
             outputs = self.nodeGraph.GetOutputs()
+            fallbackOutput = None
 
             for output in outputs:
-                if 'surface' in output.GetBaseName():
+                name = output.GetBaseName()
+                if name == 'surface':
                     return output
+                if name.rsplit(':', 1)[-1] == 'surface':
+                    fallbackOutput = output
+
+            return fallbackOutput
         return None
 
     def SetNodeGraph(self, nodeGraph):
