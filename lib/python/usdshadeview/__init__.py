@@ -133,6 +133,11 @@ def GetShaderNodeType(shaderOrNG):
         for s in shaderOrNG.GetSourceTypes():
             if s == 'mdl':
                 return NodeType.MDL
+    else:
+        mdlProps = shaderOrNG.GetPrim().GetProperties(
+            lambda name: name.startswith("info:mdl:"))
+        if mdlProps:
+            return NodeType.MDL
 
     ndId = shaderOrNG.GetShaderId()
     if not ndId:
