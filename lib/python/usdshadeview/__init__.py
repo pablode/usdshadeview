@@ -1119,9 +1119,6 @@ class ShaderNode(GraphNode):
                 portLayout.addWidget(nameWidget)
                 self.outputPortWidgets[name] = nameWidget
 
-            else:
-                self.outputPortWidgets[name] = self
-
         # Avoid whitespace because of paddding and margin when no input exists
         if portLayout.count():
             layout = self.layout()
@@ -1143,13 +1140,12 @@ class ShaderNode(GraphNode):
             w = self.inputPortWidgets[name]
             p = w.rect().center()
             y = w.mapToParent(p).y()
-        elif IsDefaultOutputPortName(name):
-            y = self.height() / 2
         elif name in self.outputPortWidgets:
             w = self.outputPortWidgets[name]
             p = w.rect().center()
             y = w.mapToParent(p).y()
         else:
+            # Default-named outputs attach at the vertical center.
             y = self.height() / 2
 
         return QtCore.QPointF(x, y)
