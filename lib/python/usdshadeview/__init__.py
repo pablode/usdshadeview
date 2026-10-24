@@ -714,12 +714,27 @@ def MakeAssetValueWidget(value):
         img = oiio.ImageInput.open(valueStr)
         if img:
             spec = img.spec()
-            imgData = img.read_image("uint8")
-            img.close()
+            try:
+                imgData = img.read_image("uint8")
+            except Exception:
+                imgData = None
+            finally:
+                img.close()
 
-            qImg = QtGui.QImage(imgData, spec.width, spec.height, QtGui.QImage.Format_RGB888)
-            pixmap = QtGui.QPixmap.fromImage(qImg)
-            imgLoaded = True
+            imgFormat = None
+            if imgData and spec.width > 0 and spec.height > 0:
+                if spec.nchannels == 1:
+                    imgFormat = QtGui.QImage.Format_Grayscale8
+                elif spec.nchannels == 3:
+                    imgFormat = QtGui.QImage.Format_RGB888
+                elif spec.nchannels == 4:
+                    imgFormat = QtGui.QImage.Format_RGBA8888
+
+            if imgFormat is not None:
+                bytesPerLine = spec.width * spec.nchannels
+                qImg = QtGui.QImage(imgData, spec.width, spec.height, bytesPerLine, imgFormat).copy()
+                pixmap = QtGui.QPixmap.fromImage(qImg)
+                imgLoaded = not pixmap.isNull()
 
     if imgLoaded:
         imgSize = 160
