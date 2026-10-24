@@ -1178,7 +1178,7 @@ class ShaderNode(GraphNode):
             nd = reg.GetShaderNodeByIdentifier(ndId)
             family = nd.GetFamily()
             # Fall back to ND if no family exists
-            typeName = family if family is not None else ndId
+            typeName = family if family else ndId
 
         if self.nodeType == NodeType.NODE_GRAPH:
             auxButtonText = "E"
