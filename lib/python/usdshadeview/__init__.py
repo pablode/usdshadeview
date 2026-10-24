@@ -263,9 +263,9 @@ class MetadataDialog(QtWidgets.QDialog):
         return data
 
     class TableModel(QtCore.QAbstractTableModel):
-        def __init__(self, data=[{}], parent=None):
+        def __init__(self, data=None, parent=None):
             super().__init__(parent)
-            self._data = data
+            self._data = data if data is not None else []
 
         def headerData(self, section, orientation, role):
             headers = [ 'Name', 'Value' ]
@@ -365,9 +365,9 @@ class NodeDefDialog(QtWidgets.QDialog):
         return data
 
     class TableModel(QtCore.QAbstractTableModel):
-        def __init__(self, data=[{}], parent=None):
+        def __init__(self, data=None, parent=None):
             super().__init__(parent)
-            self._data = data
+            self._data = data if data is not None else []
 
         def headerData(self, section, orientation, role):
             headers = [ 'Name', 'Type', 'Default', 'Documentation' ]
