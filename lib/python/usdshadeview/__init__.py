@@ -1630,7 +1630,11 @@ class GraphDialog(QtWidgets.QDialog):
 
         if filePath:
             image = self.graphWidget.RenderSceneToImage()
-            image.save(filePath)
+            if not image.save(filePath):
+                QtWidgets.QMessageBox.warning(
+                    self,
+                    "Export Failed",
+                    f"Could not save the image to:\n{filePath}")
 
     def UpdateMenuBar(self):
         layout = self.layout()
