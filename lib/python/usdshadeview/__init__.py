@@ -903,11 +903,13 @@ def MakeValueWidget(value, typeName):
 
     isColor3 = typeName in { Sdf.ValueTypeNames.Color3f, Sdf.ValueTypeNames.Color3d, Sdf.ValueTypeNames.Color3h }
     isColor4 = typeName in { Sdf.ValueTypeNames.Color4f, Sdf.ValueTypeNames.Color4d, Sdf.ValueTypeNames.Color4h }
-    isMatrix = typeName in { Sdf.ValueTypeNames.Matrix2d, Sdf.ValueTypeNames.Matrix3d, Sdf.ValueTypeNames.Matrix4d }
+    isMatrix = typeName in {
+        Sdf.ValueTypeNames.Matrix2d, Sdf.ValueTypeNames.Matrix3d, Sdf.ValueTypeNames.Matrix4d,
+        Sdf.ValueTypeNames.Frame4d
+    }
     isQuaternion = typeName in { Sdf.ValueTypeNames.Quatd, Sdf.ValueTypeNames.Quatf, Sdf.ValueTypeNames.Quath }
 
     isVector = typeName in {
-        Sdf.ValueTypeNames.Frame4d,
         Sdf.ValueTypeNames.Double2, Sdf.ValueTypeNames.Double3, Sdf.ValueTypeNames.Double4,
         Sdf.ValueTypeNames.Float2, Sdf.ValueTypeNames.Float3, Sdf.ValueTypeNames.Float4,
         Sdf.ValueTypeNames.Half2, Sdf.ValueTypeNames.Half3, Sdf.ValueTypeNames.Half4,
