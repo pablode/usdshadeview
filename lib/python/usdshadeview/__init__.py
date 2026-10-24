@@ -527,13 +527,15 @@ class ValueProxyWidget(QtWidgets.QWidget):
             if metadata:
                 a2 = menu.addAction("Show Metadata")
 
-        isLocalFile = isinstance(self.value, Sdf.AssetPath) and os.path.exists(self.value.resolvedPath)
+        filePath = None
+        isLocalFile = False
+        if isinstance(self.value, Sdf.AssetPath):
+            filePath = self.value.resolvedPath or self.value.path
+            isLocalFile = bool(filePath) and os.path.exists(filePath)
 
         a3 = None
         a4 = None
         if isLocalFile:
-            filePath = self.value.resolvedPath
-
             if IsOpenFileWithSystemSupported():
                 a3 = menu.addAction("Open File")
 
