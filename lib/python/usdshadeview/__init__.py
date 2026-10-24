@@ -749,13 +749,20 @@ def MakeAssetValueWidget(value):
         # We need to transfer the image via base64 to the tooltip, as Qt does not natively support EXR
         base64Str = PixmapToBase64(pixmap)
 
+        # Preserve the aspect ratio (temporary image)
+        thumbPixmap = pixmap.scaled(
+            16, 16,
+            QtCore.Qt.KeepAspectRatio,
+            QtCore.Qt.SmoothTransformation
+        )
+
         imgView = QtWidgets.QLabel()
-        imgView.setPixmap(pixmap)
-        imgView.setScaledContents(True) # downsample instead of crop
+        imgView.setPixmap(thumbPixmap)
+        imgView.setAlignment(QtCore.Qt.AlignCenter)
         imgView.setFixedSize(16, 16)
         imgView.setStyleSheet(BORDER_WIDGET_STYLE)
         imgView.setObjectName("ThisWidget")
-        imgView.setToolTip(f'<img width={imgSize} height={imgSize} src="data:image/png;base64,{base64Str}" />')
+        imgView.setToolTip(f'<img width={pixmap.width()} height={pixmap.height()} src="data:image/png;base64,{base64Str}" />')
 
         valueLayout.addWidget(imgView)
 
