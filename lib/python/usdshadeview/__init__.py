@@ -164,9 +164,9 @@ def IsOpenFileWithSystemSupported():
 
 def OpenFileWithSystem(filePath):
     if platform.system() == 'Darwin':
-        os.system(f'open {filePath}')
+        subprocess.call(('open', filePath))
     elif platform.system() == 'Windows':
-        os.system(f'start {filePath}')
+        os.startfile(filePath)
     else:
         subprocess.call(('xdg-open', filePath))
 
@@ -175,9 +175,9 @@ def IsOpenFileInFolderSupported():
 
 def OpenFileInFolderWithSystem(filePath):
     if platform.system() == 'Darwin':
-        os.system(f'open -R {filePath}')
+        subprocess.call(('open', '-R', filePath))
     elif platform.system() == 'Windows':
-        os.system(f'explorer.exe /select,{filePath}')
+        subprocess.call(('explorer.exe', f'/select,{filePath}'))
 
 def FormatFloatShort(value, numDigits = 4):
     if abs(value) < 1e-5:
