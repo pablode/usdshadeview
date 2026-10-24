@@ -591,7 +591,8 @@ class AlphaWidget(QtWidgets.QLabel):
         painter.fillRect(QtCore.QRect(0, 0, width, height), gradient)
 
         # Magenta line for alpha value
-        lineY = height * (1.0 - self.alphaFloat)
+        alpha = max(0.0, min(1.0, self.alphaFloat))
+        lineY = height * (1.0 - alpha)
         pen = QtGui.QPen(QtGui.QColor("magenta"))
         pen.setWidth(1)
         painter.setPen(pen)
@@ -611,7 +612,7 @@ def MakeColorValueWidget(value, isColor4):
     valueLayout.setContentsMargins(0, 0, 0, 0)
 
     maxValue = max(value[0], value[1], value[2])
-    isNormalized = maxValue <= 1.0
+    isNormalized = all(0.0 <= value[i] <= 1.0 for i in range(3))
 
     # Values can technically be > 1.0, but we still want to show them
     normValue = Gf.Vec3f(value[0], value[1], value[2]) # copy by value
@@ -619,9 +620,9 @@ def MakeColorValueWidget(value, isColor4):
     if maxValue > 1.0:
         normValue /= maxValue
 
-    hexStr = '#%02x%02x%02x' % (int(normValue[0] * 255.0),
-                                int(normValue[1] * 255.0),
-                                int(normValue[2] * 255.0))
+    hexStr = '#%02x%02x%02x' % (int(max(0.0, min(1.0, normValue[0])) * 255.0),
+                                int(max(0.0, min(1.0, normValue[1])) * 255.0),
+                                int(max(0.0, min(1.0, normValue[2])) * 255.0))
 
     if isNormalized:
         labelStr = hexStr
