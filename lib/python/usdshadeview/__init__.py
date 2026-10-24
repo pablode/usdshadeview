@@ -1728,6 +1728,7 @@ class GraphDialog(QtWidgets.QDialog):
 
     def __init__(self, mainWindow, nodeGraph):
         super().__init__(mainWindow)
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         self.graphWidget = GraphWidget(self.SetNodeGraph)
 
