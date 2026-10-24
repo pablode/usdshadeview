@@ -193,8 +193,8 @@ def FormatFloatShort(value, numDigits = 4):
 
 class BakeMtlxDialog(QtWidgets.QDialog):
 
-    def __init__(self, material):
-        super().__init__()
+    def __init__(self, material, parent=None):
+        super().__init__(parent)
         self.material = material
 
         self.setWindowTitle("Bake to Texture")
@@ -1606,8 +1606,15 @@ class GraphWidget(QtWidgets.QWidget):
 class GraphDialog(QtWidgets.QDialog):
 
     def ShowBakeMtlxDialog(self):
+        if self.bakeMtlxDialog is not None:
+            if self.bakeMtlxDialog.isVisible():
+                self.bakeMtlxDialog.raise_()
+                self.bakeMtlxDialog.activateWindow()
+                return
+            self.bakeMtlxDialog.deleteLater()
+
         material = UsdShade.Material(self.nodeGraph)
-        self.bakeMtlxDialog = BakeMtlxDialog(material)
+        self.bakeMtlxDialog = BakeMtlxDialog(material, self)
         self.bakeMtlxDialog.show()
 
     def ShowExportAsImageDialog(self):
@@ -1721,6 +1728,7 @@ class GraphDialog(QtWidgets.QDialog):
 
         self.nodeGraph = None
         self.historyStack = [] # push (ng, output) when we traverse into child NG
+        self.bakeMtlxDialog = None
         self.SetNodeGraph(nodeGraph)
 
         self.resize(1024, 768) # set default size
