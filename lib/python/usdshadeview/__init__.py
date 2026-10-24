@@ -749,7 +749,7 @@ def MakeAssetValueWidget(value):
     return QtCore.Qt.Vertical, valueWidget
 
 
-def MakeVectorValueWidget(value):
+def MakeFloat4ValueWidget(value, isQuaternion = False):
     valueStr = ToString(value)
 
     layout = QtWidgets.QHBoxLayout()
@@ -757,28 +757,35 @@ def MakeVectorValueWidget(value):
     layout.setContentsMargins(4, 2, 4, 2)
 
     minValue = float('inf')
-    maxValue = 0.0
+    maxValue = float('-inf')
 
-    vecStr = '[ '
+    if isQuaternion:
+        x = FormatFloatShort(value[1])
+        y = FormatFloatShort(value[2])
+        z = FormatFloatShort(value[3])
+        real = FormatFloatShort(value[0])
+        vecStr = f'[{x}, {y}, {z}][{real}]'
+    else:
+        vecStr = '[ '
 
-    for i in range(0, value.dimension):
-        v = value[i]
+        for i in range(0, value.dimension):
+            v = value[i]
 
-        minValue = min(v, minValue)
-        maxValue = max(v, maxValue)
+            minValue = min(v, minValue)
+            maxValue = max(v, maxValue)
 
-        if type(v) is float:
-            shortValueStr = FormatFloatShort(v)
-        else:
-            shortValueStr = ToString(v)
+            if type(v) is float:
+                shortValueStr = FormatFloatShort(v)
+            else:
+                shortValueStr = ToString(v)
 
-        vecStr += shortValueStr
+            vecStr += shortValueStr
 
-        # divider
-        if i < (value.dimension - 1):
-            vecStr += ', '
+            # divider
+            if i < (value.dimension - 1):
+                vecStr += ', '
 
-    vecStr += ' ]'
+        vecStr += ' ]'
 
     vecWidget = QtWidgets.QLabel(vecStr)
     layout.addWidget(vecWidget)
@@ -791,7 +798,7 @@ def MakeVectorValueWidget(value):
 
     orientation = QtCore.Qt.Horizontal
 
-    hasShortValues = minValue > 0.01 and maxValue < 100
+    hasShortValues = abs(minValue) > 0.01 and abs(maxValue) < 100
 
     if value.dimension > 3 or (value.dimension == 3 and not hasShortValues):
         orientation = QtCore.Qt.Vertical
@@ -846,6 +853,8 @@ def MakeValueStr(value, typeName):
         return FormatFloatShort(value.GetValue())
     elif typeName == Sdf.ValueTypeNames.Opaque:
         return '???'
+    elif typeName in (Sdf.ValueTypeNames.Quatd, Sdf.ValueTypeNames.Quatf, Sdf.ValueTypeNames.Quath):
+        return ToString(value)
     else:
         print(f"WARNING: unhandled type {str(typeName)}", file=sys.stderr)
         return ToString(value)
@@ -895,10 +904,10 @@ def MakeValueWidget(value, typeName):
     isColor3 = typeName in { Sdf.ValueTypeNames.Color3f, Sdf.ValueTypeNames.Color3d, Sdf.ValueTypeNames.Color3h }
     isColor4 = typeName in { Sdf.ValueTypeNames.Color4f, Sdf.ValueTypeNames.Color4d, Sdf.ValueTypeNames.Color4h }
     isMatrix = typeName in { Sdf.ValueTypeNames.Matrix2d, Sdf.ValueTypeNames.Matrix3d, Sdf.ValueTypeNames.Matrix4d }
+    isQuaternion = typeName in { Sdf.ValueTypeNames.Quatd, Sdf.ValueTypeNames.Quatf, Sdf.ValueTypeNames.Quath }
 
     isVector = typeName in {
         Sdf.ValueTypeNames.Frame4d,
-        Sdf.ValueTypeNames.Quatd, Sdf.ValueTypeNames.Quatf, Sdf.ValueTypeNames.Quath,
         Sdf.ValueTypeNames.Double2, Sdf.ValueTypeNames.Double3, Sdf.ValueTypeNames.Double4,
         Sdf.ValueTypeNames.Float2, Sdf.ValueTypeNames.Float3, Sdf.ValueTypeNames.Float4,
         Sdf.ValueTypeNames.Half2, Sdf.ValueTypeNames.Half3, Sdf.ValueTypeNames.Half4,
@@ -916,8 +925,17 @@ def MakeValueWidget(value, typeName):
         orientation, widget = MakeColorValueWidget(value, isColor4)
     elif isMatrix:
         widget = MakeMatrixValueWidget(value)
+    elif isQuaternion:
+        imaginary = value.GetImaginary()
+        if type(value) is Gf.Quatd:
+            vec = Gf.Vec4d(value.GetReal(), imaginary[0], imaginary[1], imaginary[2])
+        elif type(value) is Gf.Quatf:
+            vec = Gf.Vec4f(value.GetReal(), imaginary[0], imaginary[1], imaginary[2])
+        else:
+            vec = Gf.Vec4h(value.GetReal(), imaginary[0], imaginary[1], imaginary[2])
+        orientation, widget = MakeFloat4ValueWidget(vec, True)
     elif isVector:
-        orientation, widget = MakeVectorValueWidget(value)
+        orientation, widget = MakeFloat4ValueWidget(value)
     elif typeName == Sdf.ValueTypeNames.Asset:
         orientation, widget = MakeAssetValueWidget(value)
     elif typeName.isArray:
