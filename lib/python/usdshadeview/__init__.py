@@ -1803,10 +1803,6 @@ class UsdShadeViewContainer(PluginContainer):
 
     def registerPlugins(self, plugRegistry, usdviewApi):
         self.usdviewApi = usdviewApi
-        self.sdrNodesMenu = plugRegistry.registerCommandPlugin(
-            self.SDR_NODES_COMMAND_NS,
-            "List of Sdr nodes",
-            lambda *args: None)
 
     def configureView(self, plugRegistry, plugUIBuilder):
         windowMenu = plugUIBuilder.findOrCreateMenu("Window")
