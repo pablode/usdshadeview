@@ -1515,9 +1515,10 @@ class GraphWidget(QtWidgets.QWidget):
             print("WARNING: maximum node graph depth reached", file=sys.stderr)
             return
 
-        # We reuse the nodemap from the discovery phase to skip existing connections.
-        if not self.UpdateNodeMap(prim, depth):
+        # Add each node's incoming connections exactly once.
+        if prim in self.connectionVisited:
             return
+        self.connectionVisited.add(prim)
 
         for port in ports:
             source = port.GetConnectedSource()
@@ -1582,7 +1583,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.widgetMap = {} # [prim, node widget]
         self.AddNodesToLayout()
 
-        self.nodeMap = {}
+        self.connectionVisited = set()
         self.AddNodeConnections(rootPrim, rootInputs, 0)
 
         graphWidget = QtWidgets.QGraphicsWidget()
