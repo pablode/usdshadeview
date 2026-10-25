@@ -1596,6 +1596,8 @@ class GraphWidget(QtWidgets.QWidget):
         graphWidget.setLayout(self.graphLayout)
         self.scene.addItem(graphWidget)
 
+        self.graphLayout.activate() # Prevent frame flicker with incorrect layout
+
         self.graphView.setScene(self.scene)
 
         if oldScene is not None:
