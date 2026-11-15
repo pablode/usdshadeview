@@ -196,11 +196,38 @@ def FormatFloatShort(value, numDigits = 4):
             s += '0'
         return s
 
+def FindMaterialAssetRootDirs(material):
+    sourceDirs = set()
+    for prim in Usd.PrimRange(material.GetPrim()):
+        for attr in prim.GetAttributes():
+            assetPath = attr.Get()
+            if not isinstance(assetPath, Sdf.AssetPath):
+                continue
+
+            path = assetPath.path
+            resolvedPath = assetPath.resolvedPath
+            if not path or os.path.isabs(path) or not resolvedPath:
+                continue
+
+            normPath = os.path.normpath(path)
+            normResolvedPath = os.path.normpath(resolvedPath)
+            if not normResolvedPath.endswith(os.sep + normPath):
+                return None, path
+
+            sourceDir = normResolvedPath
+            for _ in normPath.split(os.sep):
+                sourceDir = os.path.dirname(sourceDir)
+            sourceDirs.add(sourceDir)
+
+    return sourceDirs, None
+
+
 class BakeMtlxDialog(QtWidgets.QDialog):
 
-    def __init__(self, material, parent=None):
+    def __init__(self, material, parent=None, sourceDir=None):
         super().__init__(parent)
         self.material = material
+        self.sourceDir = sourceDir
 
         self.setWindowTitle("Bake to Texture")
 
@@ -252,10 +279,16 @@ class BakeMtlxDialog(QtWidgets.QDialog):
             self.dirPathEdit.setText(dirPath)
 
     def OnAccept(self):
-        UsdBakeMtlx.BakeMaterial(
-            self.material, self.dirPath,
-            self.imgWidth.value(), self.imgHeight.value(),
-            self.imgHdr.isChecked(), self.imgAverage.isChecked())
+        oldDir = os.getcwd()
+        try:
+            if self.sourceDir and os.path.isdir(self.sourceDir):
+                os.chdir(self.sourceDir)
+            UsdBakeMtlx.BakeMaterial(
+                self.material, self.dirPath,
+                self.imgWidth.value(), self.imgHeight.value(),
+                self.imgHdr.isChecked(), self.imgAverage.isChecked())
+        finally:
+            os.chdir(oldDir)
 
         self.accept() # close dialog
 
@@ -1628,7 +1661,22 @@ class GraphDialog(QtWidgets.QDialog):
             self.bakeMtlxDialog.deleteLater()
 
         material = UsdShade.Material(self.nodeGraph)
-        self.bakeMtlxDialog = BakeMtlxDialog(material, self)
+
+        sourceDirs, badPath = FindMaterialAssetRootDirs(material)
+        if badPath:
+            QtWidgets.QMessageBox.warning(
+                self, "Cannot Bake to Texture",
+                f"Cannot determine the source directory of:\n{badPath}")
+            return
+        if len(sourceDirs) > 1:
+            QtWidgets.QMessageBox.warning(
+                self, "Cannot Bake to Texture",
+                "The material's textures are rooted in different directories:\n\n" +
+                "\n".join(sorted(sourceDirs)))
+            return
+
+        sourceDir = sourceDirs.pop() if sourceDirs else None
+        self.bakeMtlxDialog = BakeMtlxDialog(material, self, sourceDir)
         self.bakeMtlxDialog.show()
 
     def ShowExportAsImageDialog(self):
